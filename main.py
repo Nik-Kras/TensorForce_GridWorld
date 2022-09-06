@@ -1,13 +1,35 @@
-from tensorforce import Agent, Environment
+import tensorforce
+import Environment
+import Agent
+import numpy as np
+from MapGenerator.Grid import *
+
+from keras.layers import *
+from keras.models import *
+
+import tensorflow as tf
+
+SIZE = 4
+ROWS = 12
+COLS = 12
+
+game = Environment.GridWorld(tot_row = ROWS, tot_col = COLS)
+
+#Define the state matrix
+Generator = Grid(SIZE)
+state_matrix = Generator.GenerateMap() - 1
+game.setStateMatrix(state_matrix)
+game.setPosition()
+game.render()
 
 def main():
     print("Hi, Nikita")
 
     # Pre-defined or custom environment
-    environment = Environment.create(environment='gym', level='CartPole-v1')
+    environment = tensorforce.Environment.create(environment='gym', level='CartPole-v1')
 
     # Instantiate a Tensorforce agent
-    agent = Agent.create(
+    agent = tensorforce.Agent.create(
         agent='tensorforce',
         environment=environment,  # alternatively: states, actions, (max_episode_timesteps)
         memory=10000,
