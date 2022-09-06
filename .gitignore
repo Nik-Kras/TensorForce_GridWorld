@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Specific folders
+/gym-0.21.0
+/tensorforce
