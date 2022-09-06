@@ -25,34 +25,44 @@ game.render()
 def main():
     print("Hi, Nikita")
 
-    # Pre-defined or custom environment
-    environment = tensorforce.Environment.create(environment='gym', level='CartPole-v1')
+    environment = tensorforce.Environment.create(environment=dict(environment='gym', level='CartPole'), max_episode_timesteps=500)
+    agent = tensorforce.Agent.create(agent='ppo', environment=environment, batch_size=10,
+                                     learning_rate=1e-3, max_episode_timesteps=500)
 
-    # Instantiate a Tensorforce agent
-    agent = tensorforce.Agent.create(
-        agent='tensorforce',
-        environment=environment,  # alternatively: states, actions, (max_episode_timesteps)
-        memory=10000,
-        update=dict(unit='timesteps', batch_size=64),
-        optimizer=dict(type='adam', learning_rate=3e-4),
-        policy=dict(network='auto'),
-        objective='policy_gradient',
-        reward_estimation=dict(horizon=20)
-    )
+    # Train for 100 episodes
+    for episode in range(100):
 
-    # Train for 300 episodes
-    for _ in range(300):
-
-        # Initialize episode
+        # Episode using act and observe
         states = environment.reset()
         terminal = False
-
+        sum_rewards = 0.0
+        num_updates = 0
         while not terminal:
-            # Episode timestep
             actions = agent.act(states=states)
             states, terminal, reward = environment.execute(actions=actions)
-            agent.observe(terminal=terminal, reward=reward)
+            num_updates += agent.observe(terminal=terminal, reward=reward)
+            sum_rewards += reward
+        print('Episode {}: return={} updates={}'.format(episode, sum_rewards, num_updates))
 
+    # Evaluate for 100 episodes
+    sum_rewards = 0.0
+    g_cnt = 0
+    for g_cnt in range(100):
+        states = environment.reset()
+        internals = agent.initial_internals()
+        terminal = False
+        cnt = 0
+        while not terminal:
+            actions, internals = agent.act(
+                states=states, internals=internals, independent=True, deterministic=True
+            )
+            states, terminal, reward = environment.execute(actions=actions)
+            sum_rewards += reward
+            print("{}/{}".format(cnt+1, g_cnt+1))
+            cnt += 1
+    print('Mean evaluation return:', sum_rewards / 100.0)
+
+    # Close agent and environment
     agent.close()
     environment.close()
 
