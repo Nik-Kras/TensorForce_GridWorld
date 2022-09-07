@@ -50,8 +50,9 @@ def main():
         # summarizer=None, recorder=None
     )
 
-    # Train for 5000 episodes
-    for episode in range(5000):
+    # Train for 50,000 episodes
+    num_train_episodes = 50000
+    for episode in range(num_train_episodes):
 
         # Episode using act and observe
         states = environment.reset()
