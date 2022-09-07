@@ -316,9 +316,16 @@ class GridWorld(Environment):
             randomCol = np.random.randint(self.world_col)
             # Ensure that the obj is placed on the path
             # The coordinates will be changed until it finds a clear cell
+            cnt_of_tries = 0
             while self.state_matrix[randomRow][randomCol] != self.ObjSym["Path"]:
                 randomRow = np.random.randint(self.world_row)
                 randomCol = np.random.randint(self.world_col)
+
+                # If after 10 attempts the object was not placed - rebuild the map!
+                if cnt_of_tries > 10:
+                    self.reset()
+
+                cnt_of_tries += 1
                 # print(self.state_matrix[randomRow][randomCol])
             self.state_matrix[randomRow, randomCol] = obj    # Record obj position on the map
             # Save the player's position in the separate variable (could be reduced)

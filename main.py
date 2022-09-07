@@ -31,8 +31,8 @@ def main():
     agent = tensorforce.Agent.create(agent='ppo', environment=environment, batch_size=10,
                                      learning_rate=1e-3, max_episode_timesteps=500)
 
-    # Train for 100 episodes
-    for episode in range(100):
+    # Train for 5000 episodes
+    for episode in range(5000):
 
         # Episode using act and observe
         states = environment.reset()
@@ -46,10 +46,11 @@ def main():
             sum_rewards += reward
         print('Episode {}: return={} updates={}'.format(episode, sum_rewards, num_updates))
 
-    # Evaluate for 100 episodes
+    # Evaluate for 500 episodes
     sum_rewards = 0.0
     g_cnt = 0
-    for g_cnt in range(100):
+    num_eval_episodes = 500
+    for g_cnt in range(num_eval_episodes):
         states = environment.reset()
         internals = agent.initial_internals()
         terminal = False
@@ -59,11 +60,10 @@ def main():
                 states=states, internals=internals, independent=True, deterministic=True
             )
             states, terminal, reward = environment.execute(action=actions)
-            print("Terminal: ", terminal)
             sum_rewards += reward
             print("{}/{}".format(cnt+1, g_cnt+1))
             cnt += 1
-    print('Mean evaluation return:', sum_rewards / 100.0)
+    print('Mean evaluation return:', sum_rewards / num_eval_episodes)
 
     # Close agent and environment
     agent.close()
