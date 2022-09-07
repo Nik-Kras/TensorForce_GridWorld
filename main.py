@@ -17,15 +17,17 @@ game = Environment.GridWorld(tot_row = ROWS, tot_col = COLS)
 
 #Define the state matrix
 Generator = Grid(SIZE)
-state_matrix = Generator.GenerateMap() - 1
+state_matrix = Generator.GenerateMap()
 game.setStateMatrix(state_matrix)
 game.setPosition()
 game.render()
 
+print(game.state_matrix)
+
 def main():
     print("Hi, Nikita")
 
-    environment = tensorforce.Environment.create(environment=dict(environment='gym', level='CartPole'), max_episode_timesteps=500)
+    environment = game # tensorforce.Environment.create(environment=dict(environment='gym', level='CartPole'), max_episode_timesteps=500)
     agent = tensorforce.Agent.create(agent='ppo', environment=environment, batch_size=10,
                                      learning_rate=1e-3, max_episode_timesteps=500)
 
@@ -39,7 +41,7 @@ def main():
         num_updates = 0
         while not terminal:
             actions = agent.act(states=states)
-            states, terminal, reward = environment.execute(actions=actions)
+            states, terminal, reward = environment.execute(action=actions)
             num_updates += agent.observe(terminal=terminal, reward=reward)
             sum_rewards += reward
         print('Episode {}: return={} updates={}'.format(episode, sum_rewards, num_updates))
@@ -56,7 +58,8 @@ def main():
             actions, internals = agent.act(
                 states=states, internals=internals, independent=True, deterministic=True
             )
-            states, terminal, reward = environment.execute(actions=actions)
+            states, terminal, reward = environment.execute(action=actions)
+            print("Terminal: ", terminal)
             sum_rewards += reward
             print("{}/{}".format(cnt+1, g_cnt+1))
             cnt += 1
