@@ -168,10 +168,18 @@ class GridWorld(Environment):
 
         # Check if player picked a goal
         if   self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Path"]:   goal_picked = False  # Path
-        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal A"]: goal_picked = True  # Goal 1
-        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal B"]: goal_picked = True  # Goal 2
-        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal C"]: goal_picked = True  # Goal 3
-        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal D"]: goal_picked = True  # Goal 4
+        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal A"]:
+            goal_picked = True
+            terminate   = True
+        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal B"]:
+            goal_picked = True
+            terminate   = True
+        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal C"]:
+            goal_picked = True
+            terminate   = True
+        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal D"]:
+            goal_picked = True
+            terminate   = True
 
         return [terminate, goal_picked]
 
@@ -233,24 +241,9 @@ class GridWorld(Environment):
         reward = self.check_reward(action, terminate, goal_picked)
         observe = self.move(action, terminate, goal_picked)
 
-        if terminate: print("Episode is finished. Moves played: ", self.step_count)
+        if terminate: print("Episode is finished. Moves played: ", self.step_count, "Goal picked? ", goal_picked)
 
         return observe, terminate, reward
-
-
-
-        # Otherwise calculate the reward for according to a new cell
-        if   self.state_matrix[self.position[0], self.position[1]] == self.ObjSym["Path"]:   reward = self.step_cost  # Path
-        elif self.state_matrix[self.position[0], self.position[1]] == self.ObjSym["Goal A"]: reward = self.goal_rewards[0]  # Goal 1
-        elif self.state_matrix[self.position[0], self.position[1]] == self.ObjSym["Goal B"]: reward = self.goal_rewards[1]  # Goal 2
-        elif self.state_matrix[self.position[0], self.position[1]] == self.ObjSym["Goal C"]: reward = self.goal_rewards[2]  # Goal 3
-        elif self.state_matrix[self.position[0], self.position[1]] == self.ObjSym["Goal D"]: reward = self.goal_rewards[3]  # Goal 4
-        else: print("ERROR: Incorrect map value! Position: ", self.position[0], ", ", self.position[1])
-
-        # The state is Terminal if
-        terminal = bool(self.state_matrix[self.position[0], self.position[1]])
-
-        return self.state_matrix, terminal, reward
 
     """
             ################################  METHODS USED FOR TENSORFORCE  #####################################

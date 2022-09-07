@@ -28,8 +28,27 @@ def main():
     print("Hi, Nikita")
 
     environment = game # tensorforce.Environment.create(environment=dict(environment='gym', level='CartPole'), max_episode_timesteps=500)
-    agent = tensorforce.Agent.create(agent='ppo', environment=environment, batch_size=10,
-                                     learning_rate=1e-3, max_episode_timesteps=500)
+    # agent = tensorforce.Agent.create(agent='ppo', environment=environment, batch_size=10,
+    #                                  learning_rate=1e-3, max_episode_timesteps=500)
+
+    agent = tensorforce.Agent.create(
+        agent='ppo', environment=environment, max_episode_timesteps = 90,
+        # Automatically configured network
+        network='auto',
+        # Optimization
+        batch_size=10, update_frequency=2, learning_rate=1e-3, subsampling_fraction=0.2,
+        # Reward estimation
+        likelihood_ratio_clipping=0.2, discount=0.99,
+        # Critic
+        # baseline_optimizer=dict(optimizer='adam', multi_step=10, learning_rate=1e-3),
+        # Exploration
+        exploration=0.0, variable_noise=0.0,
+        # Regularization
+        l2_regularization=0.0, entropy_regularization=0.0,
+        # TensorFlow etc
+        # name='agent', device=None, parallel_interactions=1, seed=None, execution=None, saver=None,
+        # summarizer=None, recorder=None
+    )
 
     # Train for 5000 episodes
     for episode in range(5000):
