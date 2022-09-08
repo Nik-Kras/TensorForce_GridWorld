@@ -5,9 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from MapGenerator.Grid import *
 
-from keras.layers import *
-from keras.models import *
-
 import tensorflow as tf
 
 SIZE = 4
@@ -32,8 +29,6 @@ def main():
     # agent = tensorforce.Agent.create(agent='ppo', environment=environment, batch_size=10,
     #                                  learning_rate=1e-3, max_episode_timesteps=500)
 
-    model = "NN"
-
     # agent = tensorforce.Agent.create(
     #     agent='ppo', environment=environment, max_episode_timesteps = 90,
     #     # Automatically configured network
@@ -53,11 +48,31 @@ def main():
     #     # summarizer=None, recorder=None
     # )
 
-    agent = tensorforce.Agent.create(
-        agent='tensorforce', environment=environment, update=64,
-        optimizer=dict(optimizer='adam', learning_rate=1e-3),
-        objective='policy_gradient', reward_estimation=dict(horizon=1)
+    agent = tensorforce.agents.DeepQNetwork(
+        states = environment.states(),
+        actions = environment.actions(),
+        max_episode_timesteps = 30,
+        memory = 10000,
+        batch_size = 64,
+        network = 'auto',
+        # [
+        #     tf.keras.Input(shape=(12,12,)),
+        #     tf.keras.layers.Conv2D(name="conv2d0", filters=64, kernel_size=3, padding="same", activation="relu"),
+        #     tf.keras.layers.Conv2D(name="conv2d1", filters=64, kernel_size=3, padding="same", activation="relu"),
+        #     tf.keras.layers.MaxPooling2D(name="pooling"),
+        #     tf.keras.layers.Flatten(),
+        #     tf.keras.layers.Dense(name="FC0", units=64, activation="relu"),
+        #     tf.keras.layers.Dense(name="FC0", units=64, activation="relu"),
+        # ],
+        start_updating = 1000,
+        horizon = 0.99,
+        discount = 0.99,
+        exploration = dict(type='exponential', unit='episodes', num_steps=1000, initial_value=0.99, decay_rate=0.5),   # Decaying probability of random moves to explore env
+
     )
+
+    print(agent.get_architecture())
+    return 0
 
     # Train for 10,000 episodes
     num_train_episodes = 10000
@@ -99,9 +114,9 @@ def main():
             tracker["cnt"] += 1
         print('Episode {}: return={} updates={}'.format(episode, sum_rewards, num_updates))
 
-    plt.plot(tracker["rewards"])
+    plt.plot(tracker["rewards"][:tracker["array_cnt"]-2])
     plt.show()
-    plt.plot(tracker["picked_goal"])
+    plt.plot(tracker["picked_goal"][:tracker["array_cnt"]-2])
     plt.show()
 
     # Evaluate for 500 episodes
