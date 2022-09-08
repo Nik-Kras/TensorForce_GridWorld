@@ -4,6 +4,7 @@ import Agent
 import numpy as np
 import matplotlib.pyplot as plt
 from MapGenerator.Grid import *
+from tensorforce.execution import Runner
 
 import tensorflow as tf
 
@@ -71,18 +72,44 @@ def main():
     #
     # )
 
+    # agent = tensorforce.Agent.create(
+    #     agent='tensorforce',
+    #     environment=environment,  # alternatively: states, actions, (max_episode_timesteps)
+    #     memory=10000,
+    #     update=dict(unit='timesteps', batch_size=64),
+    #     optimizer=dict(type='adam', learning_rate=3e-4),
+    #     policy=dict(network='auto'),
+    #     objective='policy_gradient',
+    #     reward_estimation=dict(horizon=20)
+    # )
+
     agent = tensorforce.Agent.create(
-        agent='tensorforce',
-        environment=environment,  # alternatively: states, actions, (max_episode_timesteps)
-        memory=10000,
-        update=dict(unit='timesteps', batch_size=64),
-        optimizer=dict(type='adam', learning_rate=3e-4),
-        policy=dict(network='auto'),
-        objective='policy_gradient',
-        reward_estimation=dict(horizon=20)
+        agent='tensorforce', environment=environment,
+        update=64, # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+        memory=dict(type="recent", capacity=10000),
+        optimizer=dict(optimizer='adam', learning_rate=1e-3),
+        objective='policy_gradient', reward_estimation=dict(horizon=20),
+
+        # Save an agent each 1000 episodes
+        saver=dict(directory="saved_agents", filename="last_agent", frequency=1000, unit="episodes"),
+        summarizer=dict(directory="summary_agents", filename="last_agent_summary"),
+        recorder=dict(directory="recorded_agents", frequency=1000),
     )
 
     print(agent.get_architecture())
+
+    ### Checking new format of running
+    # agent_cnt = 1
+    # runner = Runner(
+    #     agent=agent,
+    #     environment=environment,
+    #     max_episode_timesteps=50
+    #     # num_parallel=5, remote='multiprocessing'
+    # )
+    # runner.run(num_episodes=10000, save_best_agent="saved_agents/Agent_" + str(agent_cnt))
+    # runner.run(num_episodes=500, evaluation=True)
+    # runner.close()
+    ### Checking new format of running
 
     # Train for 20,000 episodes
     num_train_episodes = 20000
@@ -106,7 +133,7 @@ def main():
 
         while not terminal:
             actions = agent.act(states=states)
-            states, terminal, reward = environment.execute(action=actions)
+            states, terminal, reward = environment.execute(actions=actions)
             num_updates += agent.observe(terminal=terminal, reward=reward)
             sum_rewards += reward
 
@@ -142,7 +169,7 @@ def main():
             actions, internals = agent.act(
                 states=states, internals=internals, independent=True, deterministic=True
             )
-            states, terminal, reward = environment.execute(action=actions)
+            states, terminal, reward = environment.execute(actions=actions)
             sum_rewards += reward
             print("{}/{}".format(cnt+1, g_cnt+1))
             cnt += 1

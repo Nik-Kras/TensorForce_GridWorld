@@ -54,7 +54,7 @@ PS: How to read a Map:
 
 class GridWorld(Environment):
 
-    def __init__(self, tot_row, tot_col, goal_rewards=None, step_cost=0, max_moves_per_episode=90):
+    def __init__(self, tot_row, tot_col, goal_rewards=None, step_cost=-0.001, max_moves_per_episode=90):
         super().__init__()
         self.action_space_size = 4
         self.world_row = tot_row
@@ -93,6 +93,8 @@ class GridWorld(Environment):
         # Max number of moves after which player
         self.max_moves = max_moves_per_episode
 
+        self.reward_punish = -20 # Previously was -1
+
     """
         ################################  METHODS USED FOR TENSORFORCE  #####################################
     """
@@ -120,7 +122,7 @@ class GridWorld(Environment):
     def reset(self):
         """Return initial_time_step."""
 
-        print("The RESET was called")
+        #print("The RESET was called")
 
         # Clear the Map
         empty_map = np.zeros((self.world_row, self.world_col))
@@ -149,7 +151,7 @@ class GridWorld(Environment):
 
         # If player made more than max_moves (90) steps - terminate the game
         if self.step_count > self.max_moves: return [True, goal_picked]
-        elif self.step_count == 0: print("First Move!")
+        #elif self.step_count == 0: print("First Move!")
         self.step_count += 1
 
         # Check the boarders and
@@ -160,7 +162,7 @@ class GridWorld(Environment):
         elif action == 2 and self.position[0] < self.world_row - 1: new_position = [self.position[0] + 1, self.position[1]]
         elif action == 3 and self.position[1] > 0:                  new_position = [self.position[0], self.position[1] - 1]
         else:
-            print("Player goes out of the borders")
+            #print("Player goes out of the borders")
             return [True, goal_picked] # This could be simplified to one big boolean expression instead of many if-else
 
         # Check if player has hit the wall on its move
@@ -191,7 +193,7 @@ class GridWorld(Environment):
         reward = self.step_cost
 
         # If gone out of border or stepped on the wall
-        if (terminate == True) and (goal_picked == False): return -1
+        if (terminate == True) and (goal_picked == False): return self.reward_punish
 
         # Acquiring new position
         new_position = [self.position[0], self.position[1]] # Initialize variable
@@ -233,7 +235,9 @@ class GridWorld(Environment):
 
         return self.state_matrix
 
-    def execute(self, action):
+    def execute(self, actions):
+
+        action = actions
 
         if  0 >= action >= self.action_space_size:
             raise ValueError('The action is not included in the action space.')
@@ -242,7 +246,7 @@ class GridWorld(Environment):
         reward = self.check_reward(action, terminate, goal_picked)
         observe = self.move(action, terminate, goal_picked)
 
-        if terminate: print("Episode is finished. Moves played: ", self.step_count, "Goal picked? ", goal_picked)
+        #if terminate: print("Episode is finished. Moves played: ", self.step_count, "Goal picked? ", goal_picked)
 
         return observe, terminate, reward
 
