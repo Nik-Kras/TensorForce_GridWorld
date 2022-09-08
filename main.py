@@ -29,50 +29,23 @@ def main():
     # agent = tensorforce.Agent.create(agent='ppo', environment=environment, batch_size=10,
     #                                  learning_rate=1e-3, max_episode_timesteps=500)
 
-    # agent = tensorforce.Agent.create(
-    #     agent='ppo', environment=environment, max_episode_timesteps = 90,
-    #     # Automatically configured network
-    #     network='auto',
-    #     # Optimization
-    #     batch_size=10, update_frequency=2, learning_rate=1e-3, subsampling_fraction=0.2,
-    #     # Reward estimation
-    #     likelihood_ratio_clipping=0.2, discount=0.99,
-    #     # Critic
-    #     # baseline_optimizer=dict(optimizer='adam', multi_step=10, learning_rate=1e-3),
-    #     # Exploration
-    #     exploration=0.0, variable_noise=0.0,
-    #     # Regularization
-    #     l2_regularization=0.0, entropy_regularization=0.0,
-    #     # TensorFlow etc
-    #     # name='agent', device=None, parallel_interactions=1, seed=None, execution=None, saver=None,
-    #     # summarizer=None, recorder=None
-    # )
-
-    agent = tensorforce.agents.DeepQNetwork(
-        states = environment.states(),
-        actions = environment.actions(),
-        max_episode_timesteps = 30,
-        memory = 10000,
-        batch_size = 64,
-        network = 'auto',
-        # [
-        #     tf.keras.Input(shape=(12,12,)),
-        #     tf.keras.layers.Conv2D(name="conv2d0", filters=64, kernel_size=3, padding="same", activation="relu"),
-        #     tf.keras.layers.Conv2D(name="conv2d1", filters=64, kernel_size=3, padding="same", activation="relu"),
-        #     tf.keras.layers.MaxPooling2D(name="pooling"),
-        #     tf.keras.layers.Flatten(),
-        #     tf.keras.layers.Dense(name="FC0", units=64, activation="relu"),
-        #     tf.keras.layers.Dense(name="FC0", units=64, activation="relu"),
-        # ],
-        start_updating = 1000,
-        horizon = 0.99,
-        discount = 0.99,
-        exploration = dict(type='exponential', unit='episodes', num_steps=1000, initial_value=0.99, decay_rate=0.5),   # Decaying probability of random moves to explore env
-
+    agent = tensorforce.Agent.create(
+        agent='ppo', environment=environment, max_episode_timesteps=30,
+        # Automatically configured network
+        network='auto',
+        # Optimization
+        batch_size=10, update_frequency=2, learning_rate=1e-3, subsampling_fraction=0.2,
+        # Reward estimation
+        likelihood_ratio_clipping=0.2, discount=0.99,
+        # Exploration
+        exploration=0.0, variable_noise=0.0,
+        # Regularization
+        l2_regularization=0.0, entropy_regularization=0.0,
+        # TensorFlow etc
+        parallel_interactions=5
     )
 
     print(agent.get_architecture())
-    return 0
 
     # Train for 10,000 episodes
     num_train_episodes = 10000
