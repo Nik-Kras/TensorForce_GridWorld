@@ -100,7 +100,7 @@ class GridWorld(Environment):
     # Shows specification on states data
     def states(self):
         # dict(type='int', shape=(self.world_row,self.world_col,), num_values=11)
-        return dict(type='float', shape=(self.world_row,self.world_col,), min_value=0.0, max_value=10.0)
+        return dict(type='int', shape=(self.world_row,self.world_col,), num_values=11)
 
     # Shows specification on actions
     def actions(self):
