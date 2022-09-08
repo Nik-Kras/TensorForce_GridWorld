@@ -51,7 +51,7 @@ def main():
         optimizer=dict(optimizer='adam', learning_rate=1e-3),
         objective='policy_gradient',
 
-        reward_estimation=dict(horizon=15, discount=0.99, ),    # 
+        reward_estimation=dict(horizon=15, discount=0.99, predict_terminal_values = True),    #
 
         policy = dict(
             network = dict(
@@ -61,6 +61,16 @@ def main():
                 depth = 4
             )
         )
+
+        # exploration = dict(
+        #         type='exponential', unit='episodes', num_steps=1000,
+        #         initial_value=0.99, decay_rate=0.5
+        #     )
+
+        #     (
+        #     type='linear', unit='episodes', num_steps=1000,
+        #     initial_value=10, final_value=50
+        # )
 
     )
 
