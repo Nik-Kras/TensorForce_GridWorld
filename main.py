@@ -29,20 +29,26 @@ def main():
     # agent = tensorforce.Agent.create(agent='ppo', environment=environment, batch_size=10,
     #                                  learning_rate=1e-3, max_episode_timesteps=500)
 
+    # agent = tensorforce.Agent.create(
+    #     agent='ppo', environment=environment, max_episode_timesteps=30,
+    #     # Automatically configured network
+    #     network='auto',
+    #     # Optimization
+    #     batch_size=10, update_frequency=2, learning_rate=1e-3, subsampling_fraction=0.2,
+    #     # Reward estimation
+    #     likelihood_ratio_clipping=0.2, discount=0.99,
+    #     # Exploration
+    #     exploration=0.0, variable_noise=0.0,
+    #     # Regularization
+    #     l2_regularization=0.0, entropy_regularization=0.0,
+    #     # TensorFlow etc
+    #     parallel_interactions=5
+    # )
+
     agent = tensorforce.Agent.create(
-        agent='ppo', environment=environment, max_episode_timesteps=30,
-        # Automatically configured network
-        network='auto',
-        # Optimization
-        batch_size=10, update_frequency=2, learning_rate=1e-3, subsampling_fraction=0.2,
-        # Reward estimation
-        likelihood_ratio_clipping=0.2, discount=0.99,
-        # Exploration
-        exploration=0.0, variable_noise=0.0,
-        # Regularization
-        l2_regularization=0.0, entropy_regularization=0.0,
-        # TensorFlow etc
-        parallel_interactions=5
+        agent='tensorforce', environment=environment, update=64,
+        optimizer=dict(optimizer='adam', learning_rate=1e-3),
+        objective='policy_gradient', reward_estimation=dict(horizon=1)
     )
 
     print(agent.get_architecture())
