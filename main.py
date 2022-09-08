@@ -53,8 +53,8 @@ def main():
 
     print(agent.get_architecture())
 
-    # Train for 10,000 episodes
-    num_train_episodes = 10000
+    # Train for 22,000 episodes
+    num_train_episodes = 22000
     tracker = {
         "rewards": [0],
         "picked_goal": [0],
