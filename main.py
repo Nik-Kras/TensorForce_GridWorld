@@ -2,6 +2,7 @@ import tensorforce
 import Environment
 import Agent
 import numpy as np
+import matplotlib.pyplot as plt
 from MapGenerator.Grid import *
 
 from keras.layers import *
@@ -31,27 +32,45 @@ def main():
     # agent = tensorforce.Agent.create(agent='ppo', environment=environment, batch_size=10,
     #                                  learning_rate=1e-3, max_episode_timesteps=500)
 
+    model = "NN"
+
+    # agent = tensorforce.Agent.create(
+    #     agent='ppo', environment=environment, max_episode_timesteps = 90,
+    #     # Automatically configured network
+    #     network='auto',
+    #     # Optimization
+    #     batch_size=10, update_frequency=2, learning_rate=1e-3, subsampling_fraction=0.2,
+    #     # Reward estimation
+    #     likelihood_ratio_clipping=0.2, discount=0.99,
+    #     # Critic
+    #     # baseline_optimizer=dict(optimizer='adam', multi_step=10, learning_rate=1e-3),
+    #     # Exploration
+    #     exploration=0.0, variable_noise=0.0,
+    #     # Regularization
+    #     l2_regularization=0.0, entropy_regularization=0.0,
+    #     # TensorFlow etc
+    #     # name='agent', device=None, parallel_interactions=1, seed=None, execution=None, saver=None,
+    #     # summarizer=None, recorder=None
+    # )
+
     agent = tensorforce.Agent.create(
-        agent='ppo', environment=environment, max_episode_timesteps = 90,
-        # Automatically configured network
-        network='auto',
-        # Optimization
-        batch_size=10, update_frequency=2, learning_rate=1e-3, subsampling_fraction=0.2,
-        # Reward estimation
-        likelihood_ratio_clipping=0.2, discount=0.99,
-        # Critic
-        # baseline_optimizer=dict(optimizer='adam', multi_step=10, learning_rate=1e-3),
-        # Exploration
-        exploration=0.0, variable_noise=0.0,
-        # Regularization
-        l2_regularization=0.0, entropy_regularization=0.0,
-        # TensorFlow etc
-        # name='agent', device=None, parallel_interactions=1, seed=None, execution=None, saver=None,
-        # summarizer=None, recorder=None
+        agent='tensorforce', environment=environment, update=64,
+        optimizer=dict(optimizer='adam', learning_rate=1e-3),
+        objective='policy_gradient', reward_estimation=dict(horizon=1)
     )
 
-    # Train for 50,000 episodes
-    num_train_episodes = 50000
+    # Train for 10,000 episodes
+    num_train_episodes = 10000
+    tracker = {
+        "rewards": [0],
+        "picked_goal": [0],
+        "window": 50,
+        "cnt": 0,       # Keep track on counting "window" elements per one array element
+        "array_cnt": 0  # Keep track on array indexes
+    }
+    tracker["rewards"]     = [0] * np.math.ceil((int(num_train_episodes / tracker["window"])))
+    tracker["picked_goal"] = [0] * np.math.ceil((int(num_train_episodes / tracker["window"])))
+
     for episode in range(num_train_episodes):
 
         # Episode using act and observe
@@ -59,12 +78,31 @@ def main():
         terminal = False
         sum_rewards = 0.0
         num_updates = 0
+
         while not terminal:
             actions = agent.act(states=states)
             states, terminal, reward = environment.execute(action=actions)
             num_updates += agent.observe(terminal=terminal, reward=reward)
             sum_rewards += reward
+
+        tracker["rewards"][tracker["array_cnt"]] +=  sum_rewards
+        if sum_rewards > 0: tracker["picked_goal"][tracker["array_cnt"]] += 1
+
+        # Each "window" iterations count average and go to next array element
+        if tracker["cnt"] == tracker["window"]:
+            current_index = tracker["array_cnt"]
+            tracker["rewards"][current_index]     = tracker["rewards"][current_index] / tracker["window"]
+            tracker["picked_goal"][current_index] = tracker["picked_goal"][current_index] / tracker["window"]
+            tracker["array_cnt"] += 1
+            tracker["cnt"] = 0
+        else:
+            tracker["cnt"] += 1
         print('Episode {}: return={} updates={}'.format(episode, sum_rewards, num_updates))
+
+    plt.plot(tracker["rewards"])
+    plt.show()
+    plt.plot(tracker["picked_goal"])
+    plt.show()
 
     # Evaluate for 500 episodes
     sum_rewards = 0.0
