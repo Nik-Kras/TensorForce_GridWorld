@@ -54,7 +54,7 @@ PS: How to read a Map:
 
 class GridWorld(Environment):
 
-    def __init__(self, tot_row, tot_col, goal_rewards=None, step_cost=-0.01, max_moves_per_episode=90):
+    def __init__(self, tot_row, tot_col, goal_rewards=None, step_cost=0, max_moves_per_episode=90):
         super().__init__()
         self.action_space_size = 4
         self.world_row = tot_row

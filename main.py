@@ -46,38 +46,46 @@ def main():
     #     parallel_interactions=5
     # )
 
+    # agent = tensorforce.Agent.create(
+    #     agent='tensorforce', environment=environment, update=64,
+    #     optimizer=dict(optimizer='adam', learning_rate=1e-3),
+    #     objective='policy_gradient',
+    #
+    #     reward_estimation=dict(horizon=15, discount=0.99),    #
+    #
+    #     policy = dict(
+    #         network = dict(
+    #             type="auto",
+    #             # rnn=15,         # Set the Horizon for LSTM
+    #             size = 128,
+    #             depth = 4
+    #         )
+    #     ),
+    #
+    #     exploration = dict( type='exponential', unit='episodes', num_steps=1000, initial_value=0.99, decay_rate=0.5)
+    #
+    #     #     (
+    #     #     type='linear', unit='episodes', num_steps=1000,
+    #     #     initial_value=10, final_value=50
+    #     # )
+    #
+    # )
+
     agent = tensorforce.Agent.create(
-        agent='tensorforce', environment=environment, update=64,
-        optimizer=dict(optimizer='adam', learning_rate=1e-3),
+        agent='tensorforce',
+        environment=environment,  # alternatively: states, actions, (max_episode_timesteps)
+        memory=10000,
+        update=dict(unit='timesteps', batch_size=64),
+        optimizer=dict(type='adam', learning_rate=3e-4),
+        policy=dict(network='auto'),
         objective='policy_gradient',
-
-        reward_estimation=dict(horizon=15, discount=0.99, predict_terminal_values = True),    #
-
-        policy = dict(
-            network = dict(
-                type="auto",
-                # rnn=15,         # Set the Horizon for LSTM
-                size = 128,
-                depth = 4
-            )
-        )
-
-        # exploration = dict(
-        #         type='exponential', unit='episodes', num_steps=1000,
-        #         initial_value=0.99, decay_rate=0.5
-        #     )
-
-        #     (
-        #     type='linear', unit='episodes', num_steps=1000,
-        #     initial_value=10, final_value=50
-        # )
-
+        reward_estimation=dict(horizon=20)
     )
 
     print(agent.get_architecture())
 
-    # Train for 10,000 episodes
-    num_train_episodes = 10000
+    # Train for 20,000 episodes
+    num_train_episodes = 20000
     tracker = {
         "rewards": [0],
         "picked_goal": [0],
