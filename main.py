@@ -51,7 +51,7 @@ def main():
         optimizer=dict(optimizer='adam', learning_rate=1e-3),
         objective='policy_gradient',
 
-        reward_estimation=dict(horizon=15, discount=0.99, ),
+        reward_estimation=dict(horizon=15, discount=0.99, ),    # 
 
         policy = dict(
             network = dict(
