@@ -75,7 +75,7 @@ class GridWorld(Environment):
         #self.transition_matrix = np.ones((self.action_space_size, self.action_space_size))/ self.action_space_size
         self.transition_matrix = np.eye(self.action_space_size)
 
-        self.state_matrix = np.zeros((tot_row, tot_col), dtype=float)             # Environmental Map of walls and goals
+        self.state_matrix = np.zeros((tot_row, tot_col), dtype=np.int16)             # Environmental Map of walls and goals
         self.position = [np.random.randint(tot_row), np.random.randint(tot_col)]  # Indexes of Player position
 
         # Set the reward for each goal A, B, C, D.
@@ -255,7 +255,7 @@ class GridWorld(Environment):
         Clears all the map, preparing for a new one
     """
     def clear(self):
-        self.state_matrix = np.zeros((self.world_row, self.world_col))
+        self.state_matrix = np.zeros((self.world_row, self.world_col), dtype=np.int16)
         self.position = [np.random.randint(self.world_row), np.random.randint(self.world_col)]
         self.transition_matrix = np.eye(self.action_space_size)
 

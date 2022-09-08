@@ -14,13 +14,14 @@ COLS = 12
 game = Environment.GridWorld(tot_row = ROWS, tot_col = COLS)
 
 #Define the state matrix
-Generator = Grid(SIZE)
-state_matrix = Generator.GenerateMap()
-game.setStateMatrix(state_matrix)
-game.setPosition()
+# Generator = Grid(SIZE)
+# state_matrix = Generator.GenerateMap()
+# game.setStateMatrix(state_matrix)
+# game.setPosition()
+game.reset()
 game.render()
 
-print(game.state_matrix)
+print(game.getWorldState())
 
 def main():
     print("Hi, Nikita")
@@ -48,13 +49,25 @@ def main():
     agent = tensorforce.Agent.create(
         agent='tensorforce', environment=environment, update=64,
         optimizer=dict(optimizer='adam', learning_rate=1e-3),
-        objective='policy_gradient', reward_estimation=dict(horizon=1)
+        objective='policy_gradient',
+
+        reward_estimation=dict(horizon=15, discount=0.99, ),
+
+        policy = dict(
+            network = dict(
+                type="auto",
+                # rnn=15,         # Set the Horizon for LSTM
+                size = 128,
+                depth = 4
+            )
+        )
+
     )
 
     print(agent.get_architecture())
 
-    # Train for 22,000 episodes
-    num_train_episodes = 22000
+    # Train for 10,000 episodes
+    num_train_episodes = 10000
     tracker = {
         "rewards": [0],
         "picked_goal": [0],
