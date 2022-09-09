@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from MapGenerator.Grid import *
 from tensorforce.execution import Runner
 
+import pandas as pd
 import tensorflow as tf
 
 SIZE = 4
@@ -83,12 +84,138 @@ def main():
     #     reward_estimation=dict(horizon=20)
     # )
 
+    grid_search = [
+        # Setup #1
+        dict(agent = 'tensorforce',
+             environment = environment,
+             update=64, # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam', learning_rate=1e-3),
+             objective='policy_gradient', reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
+
+        # Setup #2. Increased Update
+        dict(agent='tensorforce',
+             environment=environment,
+             update=256,  # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam', learning_rate=1e-3),
+             objective='policy_gradient', reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
+
+        # Setup #3. Increased Update with time
+        dict(agent='tensorforce',
+             environment=environment,
+             update= dict(type='linear', unit='episodes', num_steps=7000, initial_value=64, final_value=256), # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam', learning_rate=1e-3),
+             objective='policy_gradient', reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
+
+        # Setup #4. Decreased Learning Rate with time
+        dict(agent='tensorforce',
+             environment=environment,
+             update=dict(type='linear', unit='episodes', num_steps=7000, initial_value=64, final_value=256),
+             # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam', learning_rate=dict(type='linear', unit='episodes', num_steps=7000, initial_value=1e-3, final_value=1e-5)),
+             objective='policy_gradient', reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
+
+        # Check the best from 4 setups above and make 4 experiments with Neural Network of FC based on the best
+
+        # Setup #5. NN architecture #1
+
+        # Setup #6. NN architecture #2
+
+        # Setup #7. NN architecture #3
+
+        # Setup #8. NN architecture #4
+
+        # Check for the best and put increasing of Exploration for top 3 models with experiments of the range
+        # exploration=dict(type='linear', unit='episodes', num_steps=5000, initial_value=0.99, final_value=0.01)
+
+        # Setup #9. For top-1 model. Experiment with exploration #1
+
+        # Setup #10. For top-1 model. Experiment with exploration #2
+
+        # Setup #11. For top-2 model. Experiment with exploration #1
+
+        # Setup #12. For top-2 model. Experiment with exploration #2
+
+        # Setup #13. For top-3 model. Experiment with exploration #1
+
+        # Setup #14. For top-3 model. Experiment with exploration #2
+
+        # Setup #15. Try settings from point 6 of LogBook
+
+        # Setup #16. point 9 from LogBook
+
+        # When finished - Rebuild an environment to increase dimensionality and run it again!
+
+    ]
+
+    for setting in grid_search:
+        agent = tensorforce.Agent.create(
+            agent=setting["agent"],
+            environment=setting["environment"],
+            update=setting["update"],
+            memory=setting["memory"],
+            optimizer=setting["optimizer"],
+            objective=setting["objective"],
+            exploration=setting["exploration"]
+        )
+        print(agent.get_architecture())
+
+        num_train_episodes = 200
+        tracker = {
+            "rewards": [0],
+            "picked_goal": [0],
+            "window": 50,
+            "cnt": 0,  # Keep track on counting "window" elements per one array element
+            "array_cnt": 0  # Keep track on array indexes
+        }
+        tracker["rewards"] = [0] * np.math.ceil((int(num_train_episodes / tracker["window"])))
+        tracker["picked_goal"] = [0] * np.math.ceil((int(num_train_episodes / tracker["window"])))
+
+        for episode in range(num_train_episodes):
+
+            # Episode using act and observe
+            states = environment.reset()
+            terminal = False
+            sum_rewards = 0.0
+            num_updates = 0
+
+            while not terminal:
+                actions = agent.act(states=states)
+                states, terminal, reward = environment.execute(actions=actions)
+                num_updates += agent.observe(terminal=terminal, reward=reward)
+                sum_rewards += reward
+
+            tracker["rewards"][tracker["array_cnt"]] += sum_rewards
+            if sum_rewards > 0: tracker["picked_goal"][tracker["array_cnt"]] += 1
+
+            # Each "window" iterations count average and go to next array element
+            if tracker["cnt"] == tracker["window"]:
+                current_index = tracker["array_cnt"]
+                tracker["rewards"][current_index] = tracker["rewards"][current_index] / tracker["window"]
+                tracker["picked_goal"][current_index] = tracker["picked_goal"][current_index] / tracker["window"]
+                tracker["array_cnt"] += 1
+                tracker["cnt"] = 0
+            else:
+                tracker["cnt"] += 1
+            print(
+                'Episode {}: return={} moves = {} updates={}'.format(episode, sum_rewards, tracker["cnt"], num_updates))
+
+
+
+
     agent = tensorforce.Agent.create(
         agent='tensorforce', environment=environment,
-        update=16, # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+        update=64, # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
         memory=dict(type="recent", capacity=10000),
-        optimizer=dict(optimizer='adam', learning_rate=3*1e-4),
-        objective='policy_gradient', reward_estimation=dict(horizon=20),
+        optimizer=dict(optimizer='adam', learning_rate=1e-3),
+        objective='policy_gradient', reward_estimation=dict(horizon=1),
 
         # Save an agent each 1000 episodes
         saver=dict(directory="saved_agents", filename="last_agent", frequency=1000, unit="episodes"),
@@ -149,7 +276,7 @@ def main():
             tracker["cnt"] = 0
         else:
             tracker["cnt"] += 1
-        print('Episode {}: return={} updates={}'.format(episode, sum_rewards, num_updates))
+        print('Episode {}: return={} moves = {} updates={}'.format(episode, sum_rewards, tracker["cnt"], num_updates))
 
     plt.plot(tracker["rewards"][:tracker["array_cnt"]-2])
     plt.show()
