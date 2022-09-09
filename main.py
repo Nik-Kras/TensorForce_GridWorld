@@ -85,9 +85,9 @@ def main():
 
     agent = tensorforce.Agent.create(
         agent='tensorforce', environment=environment,
-        update=64, # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+        update=16, # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
         memory=dict(type="recent", capacity=10000),
-        optimizer=dict(optimizer='adam', learning_rate=1e-3),
+        optimizer=dict(optimizer='adam', learning_rate=3*1e-4),
         objective='policy_gradient', reward_estimation=dict(horizon=20),
 
         # Save an agent each 1000 episodes

@@ -131,3 +131,7 @@ dmypy.json
 # Specific folders
 /gym-0.21.0
 /tensorforce
+/summary_agents/
+/saved_agents/
+/recorded_agents/
+/Top Agent/
