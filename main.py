@@ -91,7 +91,8 @@ def main():
              update=64, # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
              memory=dict(type="recent", capacity=10000),
              optimizer=dict(optimizer='adam', learning_rate=1e-3),
-             objective='policy_gradient', reward_estimation=dict(horizon=1),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
 
         # Setup #2. Increased Update
@@ -100,26 +101,29 @@ def main():
              update=256,  # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
              memory=dict(type="recent", capacity=10000),
              optimizer=dict(optimizer='adam', learning_rate=1e-3),
-             objective='policy_gradient', reward_estimation=dict(horizon=1),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
 
-        # Setup #3. Increased Update with time
+        # Setup #3. Double Increased Update
         dict(agent='tensorforce',
              environment=environment,
-             update= dict(type='linear', unit='episodes', num_steps=7000, initial_value=64, final_value=256), # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             update= 512, # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
              memory=dict(type="recent", capacity=10000),
              optimizer=dict(optimizer='adam', learning_rate=1e-3),
-             objective='policy_gradient', reward_estimation=dict(horizon=1),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
 
         # Setup #4. Decreased Learning Rate with time
         dict(agent='tensorforce',
              environment=environment,
-             update=dict(type='linear', unit='episodes', num_steps=7000, initial_value=64, final_value=256),
+             update=256,
              # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
              memory=dict(type="recent", capacity=10000),
              optimizer=dict(optimizer='adam', learning_rate=dict(type='linear', unit='episodes', num_steps=7000, initial_value=1e-3, final_value=1e-5)),
-             objective='policy_gradient', reward_estimation=dict(horizon=1),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
 
         # Check the best from 4 setups above and make 4 experiments with Neural Network of FC based on the best
@@ -155,11 +159,17 @@ def main():
 
     ]
 
+    df = pd.DataFrame()
+    cnt_df = 1
+    num_eval_episodes = 100
+    num_train_episodes = 200
+
     for setting in grid_search:
         agent = tensorforce.Agent.create(
             agent=setting["agent"],
             environment=setting["environment"],
             update=setting["update"],
+            reward_estimation = setting["reward_estimation"],
             memory=setting["memory"],
             optimizer=setting["optimizer"],
             objective=setting["objective"],
@@ -167,7 +177,7 @@ def main():
         )
         print(agent.get_architecture())
 
-        num_train_episodes = 200
+
         tracker = {
             "rewards": [0],
             "picked_goal": [0],
@@ -207,8 +217,34 @@ def main():
             print(
                 'Episode {}: return={} moves = {} updates={}'.format(episode, sum_rewards, tracker["cnt"], num_updates))
 
+        sum_rewards = 0.0
+
+        for g_cnt in range(num_eval_episodes):
+            states = environment.reset()
+            internals = agent.initial_internals()
+            terminal = False
+            cnt = 0
+            while not terminal:
+                actions, internals = agent.act(
+                    states=states, internals=internals, independent=True, deterministic=True
+                )
+                states, terminal, reward = environment.execute(actions=actions)
+                sum_rewards += reward
+                print("{}/{}".format(cnt + 1, g_cnt + 1))
+                cnt += 1
+        print('Mean evaluation return:', )
+        agent.close()
+
+        df['Agent ' + str(cnt_df) + " Rewards"] = tracker["rewards"]
+        df['Agent ' + str(cnt_df) + " Rate"] = tracker["picked_goal"]
+        df['Agent ' + str(cnt_df) + " Test"] = sum_rewards / num_eval_episodes
+        cnt_df += 1
+
+    print(df)
+    df.to_csv('grid_search.csv')
 
 
+    """
 
     agent = tensorforce.Agent.create(
         agent='tensorforce', environment=environment,
@@ -302,8 +338,8 @@ def main():
             cnt += 1
     print('Mean evaluation return:', sum_rewards / num_eval_episodes)
 
-    # Close agent and environment
-    agent.close()
+    """
+
     environment.close()
 
 
