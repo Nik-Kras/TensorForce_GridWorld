@@ -85,41 +85,46 @@ def main():
     # )
 
     grid_search = [
-        # Setup #1 (Top Model)
-        dict(agent = 'tensorforce',
-             environment = environment,
-             update=64, # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
-             memory=dict(type="recent", capacity=10000),
-             optimizer=dict(optimizer='adam', learning_rate=1e-3),
-             objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
-             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
-
-        # Setup #2. Decreased Learning Rate with time
-        dict(agent='tensorforce',
-             environment=environment,
-             update=64,
-             # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
-             memory=dict(type="recent", capacity=10000),
-             optimizer=dict(optimizer='adam', learning_rate=dict(type='linear', unit='episodes', num_steps=5000, initial_value=1e-3, final_value=1e-5)),
-             objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
-             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
-
-        # Setup #3. Decreased Learning Rate with time
+        # Setup #1. Checking for random results
         dict(agent='tensorforce',
              environment=environment,
              update=64,
              # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
              memory=dict(type="recent", capacity=10000),
              optimizer=dict(optimizer='adam',
-                            learning_rate=dict(type='linear', unit='episodes', num_steps=7000, initial_value=1e-3,
+                            learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
                                                final_value=1e-5)),
              objective='policy_gradient',
              reward_estimation=dict(horizon=1),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
 
-        # Setup #4. Decreased Learning Rate with time
+        # Setup #2. Checking for random results
+        dict(agent='tensorforce',
+             environment=environment,
+             update=64,
+             # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam',
+                            learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
+                                               final_value=1e-5)),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
+
+        # Setup #3. Checking for random results
+        dict(agent='tensorforce',
+             environment=environment,
+             update=64,
+             # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam',
+                            learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
+                                               final_value=1e-5)),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
+
+        # Setup #4. Checking for random results
         dict(agent='tensorforce',
              environment=environment,
              update=64,
