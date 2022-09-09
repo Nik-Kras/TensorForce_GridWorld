@@ -161,8 +161,8 @@ def main():
 
     df = pd.DataFrame()
     cnt_df = 1
-    num_eval_episodes = 100
-    num_train_episodes = 200
+    num_eval_episodes = 500
+    num_train_episodes = 10000
 
     for setting in grid_search:
         agent = tensorforce.Agent.create(
