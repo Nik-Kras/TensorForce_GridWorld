@@ -546,6 +546,8 @@ def main():
         }
         tracker["rewards"] = [0] * np.math.ceil((int(num_train_episodes / tracker["window"])))
         tracker["picked_goal"] = [0] * np.math.ceil((int(num_train_episodes / tracker["window"])))
+        update_rate = 10
+        update_cnt = 0
 
         for episode in range(num_train_episodes):
 
@@ -577,13 +579,20 @@ def main():
                 episode_reward.append(reward)
                 sum_rewards += reward
 
-            # Feed recorded experience to agent
-            agent.experience(
-                states=episode_states, internals=episode_internals, actions=episode_actions,
-                terminal=episode_terminal, reward=episode_reward
-            )
-            # Perform update
-            agent.update()
+            # Update the bot each update_cnt episodes
+            if update_cnt == update_rate:
+                print("Agent updates!")
+                # Feed recorded experience to agent
+                agent.experience(
+                    states=episode_states, internals=episode_internals, actions=episode_actions,
+                    terminal=episode_terminal, reward=episode_reward
+                )
+                # Perform update
+                agent.update()
+
+                update_cnt = 0
+            else:
+                update_cnt = update_cnt + 1
 
             tracker["rewards"][tracker["array_cnt"]] += sum_rewards
             if sum_rewards > 0: tracker["picked_goal"][tracker["array_cnt"]] += 1
