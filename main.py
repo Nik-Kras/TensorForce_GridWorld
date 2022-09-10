@@ -72,7 +72,53 @@ def main():
     #     reward_estimation=dict(horizon=20)
     # )
 
+
+
     grid_search = [
+        # Setup #12. Checking for random results - With complex Neural Network  (CONV2D)
+        dict(agent='tensorforce',
+             environment=environment,
+             update=64,
+             # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam',
+                            learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
+                                               final_value=1e-5)),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
+             policy=[
+                 [
+                     dict(type='retrieve', tensors=['Player']),
+                     # dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Player-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Walls']),
+                     # dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Walls-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Goals']),
+                     # dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Goals-embedding')
+                 ],
+                 [
+                     dict(
+                         type='retrieve', aggregation='concat',
+                         tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
+                     ),
+                     dict(type='dense', size=64),
+                     dict(type='dense', size=64),
+                 ]
+             ]),
+
         # Setup #1. Checking for random results
         dict(agent='tensorforce',
              environment=environment,
@@ -84,7 +130,8 @@ def main():
                                                final_value=1e-5)),
              objective='policy_gradient',
              reward_estimation=dict(horizon=1),
-             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
+             policy=dict(network='auto')),
 
         # Setup #2. Checking for random results
         dict(agent='tensorforce',
@@ -97,7 +144,8 @@ def main():
                                                final_value=1e-5)),
              objective='policy_gradient',
              reward_estimation=dict(horizon=1),
-             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
+             policy=dict(network='auto')),
 
         # Setup #3. Checking for random results
         dict(agent='tensorforce',
@@ -110,7 +158,8 @@ def main():
                                                final_value=1e-5)),
              objective='policy_gradient',
              reward_estimation=dict(horizon=1),
-             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
+             policy=dict(network='auto')),
 
         # Setup #4. Checking for random results
         dict(agent='tensorforce',
@@ -123,7 +172,9 @@ def main():
                                                final_value=1e-5)),
              objective='policy_gradient',
              reward_estimation=dict(horizon=1),
-             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
+             policy=dict(network='auto')),
+
 
         # Setup #5. Checking for random results - With complex Neural Network (DENSE)
         dict(agent='tensorforce',
@@ -137,24 +188,24 @@ def main():
              objective='policy_gradient',
              reward_estimation=dict(horizon=1),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
-             network=[
+             policy=[
                  [
                      dict(type='retrieve', tensors=['Player']),
-                     dict(type='embedding', size=64),
+                     # dict(type='embedding', size=64),
                      dict(type='flatten'),
                      dict(type='dense', size=64),
                      dict(type='register', tensor='Player-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Walls']),
-                     dict(type='embedding', size=64),
+                     # dict(type='embedding', size=64),
                      dict(type='flatten'),
                      dict(type='dense', size=64),
                      dict(type='register', tensor='Walls-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Goals']),
-                     dict(type='embedding', size=64),
+                     # dict(type='embedding', size=64),
                      dict(type='flatten'),
                      dict(type='dense', size=64),
                      dict(type='register', tensor='Goals-embedding')
@@ -164,7 +215,8 @@ def main():
                          type='retrieve', aggregation='concat',
                          tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
                      ),
-                     dict(type='dense', size=64)
+                     dict(type='dense', size=64),
+                     dict(type='dense', size=64),
                 ]
              ]),
 
@@ -180,24 +232,24 @@ def main():
              objective='policy_gradient',
              reward_estimation=dict(horizon=1),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
-             network=[
+             policy=[
                  [
                      dict(type='retrieve', tensors=['Player']),
-                     dict(type='embedding', size=64),
+                     # dict(type='embedding', size=64),
                      dict(type='flatten'),
                      dict(type='dense', size=64),
                      dict(type='register', tensor='Player-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Walls']),
-                     dict(type='embedding', size=64),
+                     # dict(type='embedding', size=64),
                      dict(type='flatten'),
                      dict(type='dense', size=64),
                      dict(type='register', tensor='Walls-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Goals']),
-                     dict(type='embedding', size=64),
+                     # dict(type='embedding', size=64),
                      dict(type='flatten'),
                      dict(type='dense', size=64),
                      dict(type='register', tensor='Goals-embedding')
@@ -207,7 +259,8 @@ def main():
                          type='retrieve', aggregation='concat',
                          tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
                      ),
-                     dict(type='dense', size=64)
+                     dict(type='dense', size=64),
+                     dict(type='dense', size=64),
                  ]
              ]),
 
@@ -223,24 +276,24 @@ def main():
              objective='policy_gradient',
              reward_estimation=dict(horizon=1),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
-             network=[
+             policy=[
                  [
                      dict(type='retrieve', tensors=['Player']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='flatten'),
                      dict(type='dense', size=64),
                      dict(type='register', tensor='Player-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Walls']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='flatten'),
                      dict(type='dense', size=64),
                      dict(type='register', tensor='Walls-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Goals']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='flatten'),
                      dict(type='dense', size=64),
                      dict(type='register', tensor='Goals-embedding')
@@ -250,7 +303,8 @@ def main():
                          type='retrieve', aggregation='concat',
                          tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
                      ),
-                     dict(type='dense', size=64)
+                     dict(type='dense', size=64),
+                     dict(type='dense', size=64),
                  ]
              ]),
 
@@ -266,24 +320,24 @@ def main():
              objective='policy_gradient',
              reward_estimation=dict(horizon=1),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
-             network=[
+             policy=[
                  [
                      dict(type='retrieve', tensors=['Player']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='flatten'),
                      dict(type='dense', size=64),
                      dict(type='register', tensor='Player-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Walls']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='flatten'),
                      dict(type='dense', size=64),
                      dict(type='register', tensor='Walls-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Goals']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='flatten'),
                      dict(type='dense', size=64),
                      dict(type='register', tensor='Goals-embedding')
@@ -293,7 +347,8 @@ def main():
                          type='retrieve', aggregation='concat',
                          tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
                      ),
-                     dict(type='dense', size=64)
+                     dict(type='dense', size=64),
+                     dict(type='dense', size=64),
                  ]
              ]),
 
@@ -309,24 +364,24 @@ def main():
              objective='policy_gradient',
              reward_estimation=dict(horizon=1),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
-             network=[
+             policy=[
                  [
                      dict(type='retrieve', tensors=['Player']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='conv2d', size=64),
                      dict(type='flatten'),
                      dict(type='register', tensor='Player-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Walls']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='conv2d', size=64),
                      dict(type='flatten'),
                      dict(type='register', tensor='Walls-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Goals']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='conv2d', size=64),
                      dict(type='flatten'),
                      dict(type='register', tensor='Goals-embedding')
@@ -336,7 +391,8 @@ def main():
                          type='retrieve', aggregation='concat',
                          tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
                      ),
-                     dict(type='dense', size=64)
+                     dict(type='dense', size=64),
+                     dict(type='dense', size=64),
                  ]
              ]),
 
@@ -352,24 +408,24 @@ def main():
              objective='policy_gradient',
              reward_estimation=dict(horizon=1),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
-             network=[
+             policy=[
                  [
                      dict(type='retrieve', tensors=['Player']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='conv2d', size=64),
                      dict(type='flatten'),
                      dict(type='register', tensor='Player-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Walls']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='conv2d', size=64),
                      dict(type='flatten'),
                      dict(type='register', tensor='Walls-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Goals']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='conv2d', size=64),
                      dict(type='flatten'),
                      dict(type='register', tensor='Goals-embedding')
@@ -379,7 +435,8 @@ def main():
                          type='retrieve', aggregation='concat',
                          tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
                      ),
-                     dict(type='dense', size=64)
+                     dict(type='dense', size=64),
+                     dict(type='dense', size=64),
                  ]
              ]),
 
@@ -395,24 +452,24 @@ def main():
              objective='policy_gradient',
              reward_estimation=dict(horizon=1),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
-             network=[
+             policy=[
                  [
                      dict(type='retrieve', tensors=['Player']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='conv2d', size=64),
                      dict(type='flatten'),
                      dict(type='register', tensor='Player-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Walls']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='conv2d', size=64),
                      dict(type='flatten'),
                      dict(type='register', tensor='Walls-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Goals']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='conv2d', size=64),
                      dict(type='flatten'),
                      dict(type='register', tensor='Goals-embedding')
@@ -422,7 +479,8 @@ def main():
                          type='retrieve', aggregation='concat',
                          tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
                      ),
-                     dict(type='dense', size=64)
+                     dict(type='dense', size=64),
+                     dict(type='dense', size=64),
                  ]
              ]),
 
@@ -438,24 +496,24 @@ def main():
              objective='policy_gradient',
              reward_estimation=dict(horizon=1),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
-             network=[
+             policy=[
                  [
                      dict(type='retrieve', tensors=['Player']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='conv2d', size=64),
                      dict(type='flatten'),
                      dict(type='register', tensor='Player-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Walls']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='conv2d', size=64),
                      dict(type='flatten'),
                      dict(type='register', tensor='Walls-embedding')
                  ],
                  [
                      dict(type='retrieve', tensors=['Goals']),
-                     dict(type='embedding', size=64),
+                     #dict(type='embedding', size=64),
                      dict(type='conv2d', size=64),
                      dict(type='flatten'),
                      dict(type='register', tensor='Goals-embedding')
@@ -465,7 +523,8 @@ def main():
                          type='retrieve', aggregation='concat',
                          tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
                      ),
-                     dict(type='dense', size=64)
+                     dict(type='dense', size=64),
+                     dict(type='dense', size=64),
                  ]
              ]),
 
@@ -504,8 +563,8 @@ def main():
 
     df = pd.DataFrame()
     cnt_df = 1
-    num_eval_episodes = 500
-    num_train_episodes = 10000
+    num_eval_episodes = 50
+    num_train_episodes = 100
 
     for setting in grid_search:
         agent = tensorforce.Agent.create(
@@ -516,7 +575,8 @@ def main():
             memory=setting["memory"],
             optimizer=setting["optimizer"],
             objective=setting["objective"],
-            exploration=setting["exploration"]
+            exploration=setting["exploration"],
+            policy=setting["policy"]
         )
         print(agent.get_architecture())
 
@@ -539,11 +599,35 @@ def main():
             sum_rewards = 0.0
             num_updates = 0
 
+            # Record episode experience
+            episode_states = list()
+            episode_internals = list()
+            episode_actions = list()
+            episode_terminal = list()
+            episode_reward = list()
+
+
+            internals = agent.initial_internals()
+
             while not terminal:
-                actions = agent.act(states=states)
+
+                # Record for learning
+                episode_states.append(states)
+                episode_internals.append(internals)
+                actions, internals = agent.act(states=states, internals=internals, independent=True)
+                episode_actions.append(actions)
                 states, terminal, reward = environment.execute(actions=actions)
-                num_updates += agent.observe(terminal=terminal, reward=reward)
+                episode_terminal.append(terminal)
+                episode_reward.append(reward)
                 sum_rewards += reward
+
+            # Feed recorded experience to agent
+            agent.experience(
+                states=episode_states, internals=episode_internals, actions=episode_actions,
+                terminal=episode_terminal, reward=episode_reward
+            )
+            # Perform update
+            agent.update()
 
             tracker["rewards"][tracker["array_cnt"]] += sum_rewards
             if sum_rewards > 0: tracker["picked_goal"][tracker["array_cnt"]] += 1
@@ -557,8 +641,7 @@ def main():
                 tracker["cnt"] = 0
             else:
                 tracker["cnt"] += 1
-            print(
-                'Episode {}: return={} moves = {} updates={}'.format(episode, sum_rewards, tracker["cnt"], num_updates))
+            print('Episode {}: {}'.format(episode, sum_rewards))
 
         sum_rewards = 0.0
 

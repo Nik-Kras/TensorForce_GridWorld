@@ -108,9 +108,9 @@ class GridWorld(Environment):
         #self.transition_matrix = np.ones((self.action_space_size, self.action_space_size))/ self.action_space_size
         self.transition_matrix = np.eye(self.action_space_size)
 
-        self.state_matrix = [np.zeros((self.world_row, self.world_col), dtype=np.int16),
-                             np.zeros((self.world_row, self.world_col), dtype=np.int16),
-                             np.zeros((self.world_row, self.world_col), dtype=np.int16)]             # Environmental Map of walls and goals
+        self.state_matrix = [np.zeros((1, self.world_row, self.world_col,), dtype=np.float16),
+                             np.zeros((1, self.world_row, self.world_col,), dtype=np.float16),
+                             np.zeros((1, self.world_row, self.world_col,), dtype=np.float16)]             # Environmental Map of walls and goals
         self.position = [np.random.randint(self.world_row), np.random.randint(self.world_col)]  # Indexes of Player position
 
         # Set the reward for each goal A, B, C, D.
@@ -138,9 +138,9 @@ class GridWorld(Environment):
     def states(self):
         # dict(type='int', shape=(self.world_row,self.world_col,), num_values=11)
         return dict(
-            Player = dict(type='int', shape=(self.world_row,self.world_col,), num_values=2),
-            Walls = dict(type='int', shape=(self.world_row, self.world_col,), num_values=2),
-            Goals = dict(type='int', shape=(self.world_row, self.world_col,), num_values=5)
+            Player = dict(type='float', shape=(1, self.world_row, self.world_col,)),
+            Walls = dict(type='float',  shape=(1, self.world_row,  self.world_col,)),
+            Goals = dict(type='float',  shape=(1, self.world_row,  self.world_col,))
         )
 
     # Shows specification on actions
@@ -342,7 +342,7 @@ class GridWorld(Environment):
         """
 
         # 1. Put player on the map
-        player_map = np.zeros((self.world_row, self.world_col), dtype=np.int16)
+        player_map = np.zeros((self.world_row, self.world_col), dtype=np.float16)
         cnt_of_tries = 0
         randomRow = 0
         randomCol = 0
@@ -369,7 +369,7 @@ class GridWorld(Environment):
         self.setStateMatrix(player_map, set="player")
 
         # 2. Put Goals on the map
-        goal_map = np.zeros((self.world_row, self.world_col), dtype=np.int16)
+        goal_map = np.zeros((self.world_row, self.world_col), dtype=np.float16)
         Goals = self.MapSym[self.GoalMap].copy()
         Goals.popitem() # Remove "Others", so only Goal A - D are in the dictionary
 
