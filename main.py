@@ -125,6 +125,350 @@ def main():
              reward_estimation=dict(horizon=1),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01)),
 
+        # Setup #5. Checking for random results - With complex Neural Network (DENSE)
+        dict(agent='tensorforce',
+             environment=environment,
+             update=64,
+             # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam',
+                            learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
+                                               final_value=1e-5)),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
+             network=[
+                 [
+                     dict(type='retrieve', tensors=['Player']),
+                     dict(type='embedding', size=64),
+                     dict(type='flatten'),
+                     dict(type='dense', size=64),
+                     dict(type='register', tensor='Player-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Walls']),
+                     dict(type='embedding', size=64),
+                     dict(type='flatten'),
+                     dict(type='dense', size=64),
+                     dict(type='register', tensor='Walls-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Goals']),
+                     dict(type='embedding', size=64),
+                     dict(type='flatten'),
+                     dict(type='dense', size=64),
+                     dict(type='register', tensor='Goals-embedding')
+                 ],
+                 [
+                     dict(
+                         type='retrieve', aggregation='concat',
+                         tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
+                     ),
+                     dict(type='dense', size=64)
+                ]
+             ]),
+
+        # Setup #6. Checking for random results - With complex Neural Network  (DENSE)
+        dict(agent='tensorforce',
+             environment=environment,
+             update=64,
+             # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam',
+                            learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
+                                               final_value=1e-5)),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
+             network=[
+                 [
+                     dict(type='retrieve', tensors=['Player']),
+                     dict(type='embedding', size=64),
+                     dict(type='flatten'),
+                     dict(type='dense', size=64),
+                     dict(type='register', tensor='Player-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Walls']),
+                     dict(type='embedding', size=64),
+                     dict(type='flatten'),
+                     dict(type='dense', size=64),
+                     dict(type='register', tensor='Walls-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Goals']),
+                     dict(type='embedding', size=64),
+                     dict(type='flatten'),
+                     dict(type='dense', size=64),
+                     dict(type='register', tensor='Goals-embedding')
+                 ],
+                 [
+                     dict(
+                         type='retrieve', aggregation='concat',
+                         tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
+                     ),
+                     dict(type='dense', size=64)
+                 ]
+             ]),
+
+        # Setup #7. Checking for random results - With complex Neural Network  (DENSE)
+        dict(agent='tensorforce',
+             environment=environment,
+             update=64,
+             # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam',
+                            learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
+                                               final_value=1e-5)),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
+             network=[
+                 [
+                     dict(type='retrieve', tensors=['Player']),
+                     dict(type='embedding', size=64),
+                     dict(type='flatten'),
+                     dict(type='dense', size=64),
+                     dict(type='register', tensor='Player-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Walls']),
+                     dict(type='embedding', size=64),
+                     dict(type='flatten'),
+                     dict(type='dense', size=64),
+                     dict(type='register', tensor='Walls-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Goals']),
+                     dict(type='embedding', size=64),
+                     dict(type='flatten'),
+                     dict(type='dense', size=64),
+                     dict(type='register', tensor='Goals-embedding')
+                 ],
+                 [
+                     dict(
+                         type='retrieve', aggregation='concat',
+                         tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
+                     ),
+                     dict(type='dense', size=64)
+                 ]
+             ]),
+
+        # Setup #8. Checking for random results - With complex Neural Network  (DENSE)
+        dict(agent='tensorforce',
+             environment=environment,
+             update=64,
+             # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam',
+                            learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
+                                               final_value=1e-5)),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
+             network=[
+                 [
+                     dict(type='retrieve', tensors=['Player']),
+                     dict(type='embedding', size=64),
+                     dict(type='flatten'),
+                     dict(type='dense', size=64),
+                     dict(type='register', tensor='Player-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Walls']),
+                     dict(type='embedding', size=64),
+                     dict(type='flatten'),
+                     dict(type='dense', size=64),
+                     dict(type='register', tensor='Walls-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Goals']),
+                     dict(type='embedding', size=64),
+                     dict(type='flatten'),
+                     dict(type='dense', size=64),
+                     dict(type='register', tensor='Goals-embedding')
+                 ],
+                 [
+                     dict(
+                         type='retrieve', aggregation='concat',
+                         tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
+                     ),
+                     dict(type='dense', size=64)
+                 ]
+             ]),
+
+        # Setup #9. Checking for random results - With complex Neural Network  (CONV2D)
+        dict(agent='tensorforce',
+             environment=environment,
+             update=64,
+             # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam',
+                            learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
+                                               final_value=1e-5)),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
+             network=[
+                 [
+                     dict(type='retrieve', tensors=['Player']),
+                     dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Player-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Walls']),
+                     dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Walls-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Goals']),
+                     dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Goals-embedding')
+                 ],
+                 [
+                     dict(
+                         type='retrieve', aggregation='concat',
+                         tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
+                     ),
+                     dict(type='dense', size=64)
+                 ]
+             ]),
+
+        # Setup #10. Checking for random results - With complex Neural Network  (CONV2D)
+        dict(agent='tensorforce',
+             environment=environment,
+             update=64,
+             # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam',
+                            learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
+                                               final_value=1e-5)),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
+             network=[
+                 [
+                     dict(type='retrieve', tensors=['Player']),
+                     dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Player-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Walls']),
+                     dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Walls-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Goals']),
+                     dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Goals-embedding')
+                 ],
+                 [
+                     dict(
+                         type='retrieve', aggregation='concat',
+                         tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
+                     ),
+                     dict(type='dense', size=64)
+                 ]
+             ]),
+
+        # Setup #11. Checking for random results - With complex Neural Network  (CONV2D)
+        dict(agent='tensorforce',
+             environment=environment,
+             update=64,
+             # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam',
+                            learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
+                                               final_value=1e-5)),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
+             network=[
+                 [
+                     dict(type='retrieve', tensors=['Player']),
+                     dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Player-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Walls']),
+                     dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Walls-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Goals']),
+                     dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Goals-embedding')
+                 ],
+                 [
+                     dict(
+                         type='retrieve', aggregation='concat',
+                         tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
+                     ),
+                     dict(type='dense', size=64)
+                 ]
+             ]),
+
+        # Setup #12. Checking for random results - With complex Neural Network  (CONV2D)
+        dict(agent='tensorforce',
+             environment=environment,
+             update=64,
+             # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
+             memory=dict(type="recent", capacity=10000),
+             optimizer=dict(optimizer='adam',
+                            learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
+                                               final_value=1e-5)),
+             objective='policy_gradient',
+             reward_estimation=dict(horizon=1),
+             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
+             network=[
+                 [
+                     dict(type='retrieve', tensors=['Player']),
+                     dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Player-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Walls']),
+                     dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Walls-embedding')
+                 ],
+                 [
+                     dict(type='retrieve', tensors=['Goals']),
+                     dict(type='embedding', size=64),
+                     dict(type='conv2d', size=64),
+                     dict(type='flatten'),
+                     dict(type='register', tensor='Goals-embedding')
+                 ],
+                 [
+                     dict(
+                         type='retrieve', aggregation='concat',
+                         tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
+                     ),
+                     dict(type='dense', size=64)
+                 ]
+             ]),
+
         # Check the best from 4 setups above and make 4 experiments with Neural Network of FC based on the best
 
         # Setup #5. NN architecture #1

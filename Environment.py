@@ -108,7 +108,9 @@ class GridWorld(Environment):
         #self.transition_matrix = np.ones((self.action_space_size, self.action_space_size))/ self.action_space_size
         self.transition_matrix = np.eye(self.action_space_size)
 
-        self.state_matrix = np.zeros((3, self.world_row, self.world_col), dtype=np.int16)             # Environmental Map of walls and goals
+        self.state_matrix = [np.zeros((self.world_row, self.world_col), dtype=np.int16),
+                             np.zeros((self.world_row, self.world_col), dtype=np.int16),
+                             np.zeros((self.world_row, self.world_col), dtype=np.int16)]             # Environmental Map of walls and goals
         self.position = [np.random.randint(self.world_row), np.random.randint(self.world_col)]  # Indexes of Player position
 
         # Set the reward for each goal A, B, C, D.
@@ -168,7 +170,7 @@ class GridWorld(Environment):
         # Create a new Map
         Generator = Grid(int(self.world_row / 3))  # How many 3x3 tiles should be put in the Map
         walls = Generator.GenerateMap()
-        print("Created Walls Map: ", walls)
+        # print("Created Walls Map: ", walls)
         self.setStateMatrix(walls, set="walls")
 
         # Put player and goals on the map
@@ -177,8 +179,12 @@ class GridWorld(Environment):
         # Clear step counter in the game
         self.step_count = 0
 
+        dict_map = {"Player": self.state_matrix[self.PlayerMap],
+                    "Walls": self.state_matrix[self.WallMap],
+                    "Goals": self.state_matrix[self.GoalMap]}
+
         # In the future, it should output Observed map (7x7), not "self.state_matrix"
-        return self.state_matrix
+        return dict_map
 
     def check_terminate(self, action):
 
@@ -271,7 +277,11 @@ class GridWorld(Environment):
         self.position = new_position
         self.state_matrix[self.PlayerMap, self.position[0], self.position[1]] = self.MapSym[self.PlayerMap]["Player"] # self.ObjSym["Player"]
 
-        return self.state_matrix
+        dict_map = {"Player": self.state_matrix[self.PlayerMap],
+                    "Walls": self.state_matrix[self.WallMap],
+                    "Goals": self.state_matrix[self.GoalMap]}
+
+        return dict_map
 
     def execute(self, actions):
 
@@ -305,8 +315,8 @@ class GridWorld(Environment):
         same size of the world
         """
         if set=="all":
-            if state_matrix.shape != self.state_matrix.shape:
-                raise ValueError('The shape of the matrix does not match with the shape of the world.')
+            # if state_matrix.shape != self.state_matrix.shape:
+            #     raise ValueError('The shape of the matrix does not match with the shape of the world.')
             self.state_matrix = state_matrix
         elif set=="player":
             if state_matrix.shape != self.state_matrix[self.PlayerMap].shape:
@@ -383,7 +393,7 @@ class GridWorld(Environment):
 
             goal_map[randomRow, randomCol] = self.MapSym[self.GoalMap][key]
 
-        print("Created Goal Map: ", goal_map)
+        # print("Created Goal Map: ", goal_map)
         self.setStateMatrix(goal_map, set="goals")
 
         """
