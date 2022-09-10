@@ -75,50 +75,6 @@ def main():
 
 
     grid_search = [
-        # Setup #12. Checking for random results - With complex Neural Network  (CONV2D)
-        dict(agent='tensorforce',
-             environment=environment,
-             update=64,
-             # dict(unit="episodes", batch_size=64, frequency=0.5, start=1000),
-             memory=dict(type="recent", capacity=10000),
-             optimizer=dict(optimizer='adam',
-                            learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
-                                               final_value=1e-5)),
-             objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
-             exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
-             policy=[
-                 [
-                     dict(type='retrieve', tensors=['Player']),
-                     # dict(type='embedding', size=64),
-                     dict(type='conv2d', size=64),
-                     dict(type='flatten'),
-                     dict(type='register', tensor='Player-embedding')
-                 ],
-                 [
-                     dict(type='retrieve', tensors=['Walls']),
-                     # dict(type='embedding', size=64),
-                     dict(type='conv2d', size=64),
-                     dict(type='flatten'),
-                     dict(type='register', tensor='Walls-embedding')
-                 ],
-                 [
-                     dict(type='retrieve', tensors=['Goals']),
-                     # dict(type='embedding', size=64),
-                     dict(type='conv2d', size=64),
-                     dict(type='flatten'),
-                     dict(type='register', tensor='Goals-embedding')
-                 ],
-                 [
-                     dict(
-                         type='retrieve', aggregation='concat',
-                         tensors=['Goals-embedding', 'Walls-embedding', 'Player-embedding']
-                     ),
-                     dict(type='dense', size=64),
-                     dict(type='dense', size=64),
-                 ]
-             ]),
-
         # Setup #1. Checking for random results
         dict(agent='tensorforce',
              environment=environment,
@@ -563,8 +519,8 @@ def main():
 
     df = pd.DataFrame()
     cnt_df = 1
-    num_eval_episodes = 50
-    num_train_episodes = 100
+    num_eval_episodes = 500
+    num_train_episodes = 10000
 
     for setting in grid_search:
         agent = tensorforce.Agent.create(

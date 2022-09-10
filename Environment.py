@@ -108,9 +108,9 @@ class GridWorld(Environment):
         #self.transition_matrix = np.ones((self.action_space_size, self.action_space_size))/ self.action_space_size
         self.transition_matrix = np.eye(self.action_space_size)
 
-        self.state_matrix = [np.zeros((1, self.world_row, self.world_col,), dtype=np.float16),
-                             np.zeros((1, self.world_row, self.world_col,), dtype=np.float16),
-                             np.zeros((1, self.world_row, self.world_col,), dtype=np.float16)]             # Environmental Map of walls and goals
+        self.state_matrix = [np.zeros((1,self.world_row, self.world_col,1), dtype=np.float16),
+                             np.zeros((1,self.world_row, self.world_col,1), dtype=np.float16),
+                             np.zeros((1,self.world_row, self.world_col,1), dtype=np.float16)]             # Environmental Map of walls and goals
         self.position = [np.random.randint(self.world_row), np.random.randint(self.world_col)]  # Indexes of Player position
 
         # Set the reward for each goal A, B, C, D.
@@ -138,9 +138,9 @@ class GridWorld(Environment):
     def states(self):
         # dict(type='int', shape=(self.world_row,self.world_col,), num_values=11)
         return dict(
-            Player = dict(type='float', shape=(1, self.world_row, self.world_col,)),
-            Walls = dict(type='float',  shape=(1, self.world_row,  self.world_col,)),
-            Goals = dict(type='float',  shape=(1, self.world_row,  self.world_col,))
+            Player = dict(type='float', shape=(1, self.world_row, self.world_col)),
+            Walls = dict(type='float',  shape=(1, self.world_row,  self.world_col)),
+            Goals = dict(type='float',  shape=(1, self.world_row,  self.world_col))
         )
 
     # Shows specification on actions
@@ -179,9 +179,9 @@ class GridWorld(Environment):
         # Clear step counter in the game
         self.step_count = 0
 
-        dict_map = {"Player": self.state_matrix[self.PlayerMap],
-                    "Walls": self.state_matrix[self.WallMap],
-                    "Goals": self.state_matrix[self.GoalMap]}
+        dict_map = {"Player": np.expand_dims(self.state_matrix[self.PlayerMap], axis=0),
+                    "Walls":  np.expand_dims(self.state_matrix[self.WallMap], axis=0),
+                    "Goals":  np.expand_dims(self.state_matrix[self.GoalMap], axis=0)}
 
         # In the future, it should output Observed map (7x7), not "self.state_matrix"
         return dict_map
@@ -277,9 +277,9 @@ class GridWorld(Environment):
         self.position = new_position
         self.state_matrix[self.PlayerMap, self.position[0], self.position[1]] = self.MapSym[self.PlayerMap]["Player"] # self.ObjSym["Player"]
 
-        dict_map = {"Player": self.state_matrix[self.PlayerMap],
-                    "Walls": self.state_matrix[self.WallMap],
-                    "Goals": self.state_matrix[self.GoalMap]}
+        dict_map = {"Player": np.expand_dims(self.state_matrix[self.PlayerMap], axis=0),
+                    "Walls": np.expand_dims(self.state_matrix[self.WallMap], axis=0),
+                    "Goals": np.expand_dims(self.state_matrix[self.GoalMap], axis=0)}
 
         return dict_map
 
