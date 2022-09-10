@@ -135,7 +135,11 @@ class GridWorld(Environment):
     # Shows specification on states data
     def states(self):
         # dict(type='int', shape=(self.world_row,self.world_col,), num_values=11)
-        return dict(type='int', shape=(3, self.world_row,self.world_col,), num_values=4)
+        return dict(
+            Player = dict(type='int', shape=(self.world_row,self.world_col,), num_values=2),
+            Walls = dict(type='int', shape=(self.world_row, self.world_col,), num_values=2),
+            Goals = dict(type='int', shape=(self.world_row, self.world_col,), num_values=5)
+        )
 
     # Shows specification on actions
     def actions(self):

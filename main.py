@@ -350,4 +350,4 @@ if __name__ == '__main__':
     game.render()
     print(game.getWorldState())
 
-    # main()
+    main()
