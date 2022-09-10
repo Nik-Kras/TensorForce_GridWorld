@@ -13,18 +13,6 @@ SIZE = 4
 ROWS = 12
 COLS = 12
 
-game = Environment.GridWorld(tot_row = ROWS, tot_col = COLS)
-
-#Define the state matrix
-# Generator = Grid(SIZE)
-# state_matrix = Generator.GenerateMap()
-# game.setStateMatrix(state_matrix)
-# game.setPosition()
-game.reset()
-game.render()
-
-print(game.getWorldState())
-
 def main():
     print("Hi, Nikita")
 
@@ -355,4 +343,11 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+
+    game = Environment.GridWorld(tot_row=ROWS, tot_col=COLS)
+
+    game.reset()
+    game.render()
+    print(game.getWorldState())
+
+    # main()

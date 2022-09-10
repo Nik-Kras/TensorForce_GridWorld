@@ -50,6 +50,19 @@ PS: How to read a Map:
     4 - Goal C
     5 - Goal D
     10 - Player
+    
+PS: New Map:
+
+    1. Player
+        1 - Player
+        0 - other
+    2. Walls
+        1 - Walls
+        0 - other
+    3. Goals
+        1.0-inf - Goals (all goals values normalized?)
+        0 - other
+         
 """
 
 class GridWorld(Environment):
@@ -59,6 +72,11 @@ class GridWorld(Environment):
         self.action_space_size = 4
         self.world_row = tot_row
         self.world_col = tot_col
+
+        # Indexes for 3 map layers
+        self.PlayerMap = 0
+        self.WallMap = 1
+        self.GoalMap = 2
 
         # Set the values to represent objects on the Map
         self.ObjSym = {
@@ -71,12 +89,27 @@ class GridWorld(Environment):
             "Player": 10,
         }
 
+        self.MapSym =[
+            # self.PlayerMap
+            {"Player": 1,
+             "Other": 0},
+            # self.WallMap
+            {"Wall": 0,
+             "Other": 1},
+            # self.GoalMap
+            {"Goal A": 1,
+             "Goal B": 2,
+             "Goal C": 3,
+             "Goal D": 4,
+             "Other": 0}
+        ]
+
         # Originally agent was started as random, I changed to be deterministic ( [0.5, 0.5] -> [1, 0] )
         #self.transition_matrix = np.ones((self.action_space_size, self.action_space_size))/ self.action_space_size
         self.transition_matrix = np.eye(self.action_space_size)
 
-        self.state_matrix = np.zeros((tot_row, tot_col), dtype=np.int16)             # Environmental Map of walls and goals
-        self.position = [np.random.randint(tot_row), np.random.randint(tot_col)]  # Indexes of Player position
+        self.state_matrix = np.zeros((3, self.world_row, self.world_col), dtype=np.int16)             # Environmental Map of walls and goals
+        self.position = [np.random.randint(self.world_row), np.random.randint(self.world_col)]  # Indexes of Player position
 
         # Set the reward for each goal A, B, C, D.
         # It could differ for each agent,
@@ -102,7 +135,7 @@ class GridWorld(Environment):
     # Shows specification on states data
     def states(self):
         # dict(type='int', shape=(self.world_row,self.world_col,), num_values=11)
-        return dict(type='int', shape=(self.world_row,self.world_col,), num_values=11)
+        return dict(type='int', shape=(3, self.world_row,self.world_col,), num_values=4)
 
     # Shows specification on actions
     def actions(self):
@@ -125,13 +158,14 @@ class GridWorld(Environment):
         #print("The RESET was called")
 
         # Clear the Map
-        empty_map = np.zeros((self.world_row, self.world_col))
-        self.setStateMatrix(empty_map)
+        empty_map = np.zeros((3, self.world_row, self.world_col))
+        self.setStateMatrix(empty_map, set="all")
 
         # Create a new Map
         Generator = Grid(int(self.world_row / 3))  # How many 3x3 tiles should be put in the Map
-        state_matrix = Generator.GenerateMap()
-        self.setStateMatrix(state_matrix)
+        walls = Generator.GenerateMap()
+        print("Created Walls Map: ", walls)
+        self.setStateMatrix(walls, set="walls")
 
         # Put player and goals on the map
         self.setPosition()
@@ -166,21 +200,21 @@ class GridWorld(Environment):
             return [True, goal_picked] # This could be simplified to one big boolean expression instead of many if-else
 
         # Check if player has hit the wall on its move
-        hit_wall = self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Wall"]
+        hit_wall = self.state_matrix[self.WallMap, new_position[0], new_position[1]] == self.MapSym[self.WallMap]["Wall"]  #self.ObjSym["Wall"]
         if hit_wall: return [True, goal_picked]
 
         # Check if player picked a goal
-        if   self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Path"]:   goal_picked = False  # Path
-        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal A"]:
+        if   self.state_matrix[self.GoalMap, new_position[0], new_position[1]] == self.MapSym[self.GoalMap]["Other"]:  goal_picked = False  # Path
+        elif self.state_matrix[self.GoalMap, new_position[0], new_position[1]] == self.MapSym[self.GoalMap]["Goal A"]:
             goal_picked = True
             terminate   = True
-        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal B"]:
+        elif self.state_matrix[self.GoalMap, new_position[0], new_position[1]] == self.MapSym[self.GoalMap]["Goal B"]:
             goal_picked = True
             terminate   = True
-        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal C"]:
+        elif self.state_matrix[self.GoalMap, new_position[0], new_position[1]] == self.MapSym[self.GoalMap]["Goal C"]:
             goal_picked = True
             terminate   = True
-        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal D"]:
+        elif self.state_matrix[self.GoalMap, new_position[0], new_position[1]] == self.MapSym[self.GoalMap]["Goal D"]:
             goal_picked = True
             terminate   = True
 
@@ -204,11 +238,11 @@ class GridWorld(Environment):
         else: print("ERROR: The action is incorrect. Must be between 0 and 3, got: ", action)
 
         # Check receiving the goal in the next step and taking according reward
-        if   self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Path"]:   reward = self.step_cost        # Path
-        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal A"]: reward = self.goal_rewards[0]  # Goal 1
-        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal B"]: reward = self.goal_rewards[1]  # Goal 2
-        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal C"]: reward = self.goal_rewards[2]  # Goal 3
-        elif self.state_matrix[new_position[0], new_position[1]] == self.ObjSym["Goal D"]: reward = self.goal_rewards[3]  # Goal 4
+        if   self.state_matrix[self.GoalMap, new_position[0], new_position[1]] == self.MapSym[self.GoalMap]["Other"]:  reward = self.step_cost        # Path
+        elif self.state_matrix[self.GoalMap, new_position[0], new_position[1]] == self.MapSym[self.GoalMap]["Goal A"]: reward = self.goal_rewards[0]  # Goal 1
+        elif self.state_matrix[self.GoalMap, new_position[0], new_position[1]] == self.MapSym[self.GoalMap]["Goal B"]: reward = self.goal_rewards[1]  # Goal 2
+        elif self.state_matrix[self.GoalMap, new_position[0], new_position[1]] == self.MapSym[self.GoalMap]["Goal C"]: reward = self.goal_rewards[2]  # Goal 3
+        elif self.state_matrix[self.GoalMap, new_position[0], new_position[1]] == self.MapSym[self.GoalMap]["Goal D"]: reward = self.goal_rewards[3]  # Goal 4
         else: print("ERROR: Incorrect map value! Position: ", new_position[0], ", ", new_position[1])
 
         return reward
@@ -227,11 +261,11 @@ class GridWorld(Environment):
         else: print("ERROR: The action is incorrect. Must be between 0 and 3, got: ", action)
 
         # Clear the current place of the player (COULD BE CHANGED WITH NEW ELEMENT TO SHOW TRAJECTORY)
-        self.state_matrix[self.position[0], self.position[1]] = self.ObjSym["Path"]
+        self.state_matrix[self.PlayerMap, self.position[0], self.position[1]] = self.MapSym[self.PlayerMap]["Other"] # self.ObjSym["Path"]
 
         # Update the player's position!
         self.position = new_position
-        self.state_matrix[self.position[0], self.position[1]] = self.ObjSym["Player"]
+        self.state_matrix[self.PlayerMap, self.position[0], self.position[1]] = self.MapSym[self.PlayerMap]["Player"] # self.ObjSym["Player"]
 
         return self.state_matrix
 
@@ -259,53 +293,96 @@ class GridWorld(Environment):
         Clears all the map, preparing for a new one
     """
     def clear(self):
-        self.state_matrix = np.zeros((self.world_row, self.world_col), dtype=np.int16)
-        self.position = [np.random.randint(self.world_row), np.random.randint(self.world_col)]
-        self.transition_matrix = np.eye(self.action_space_size)
+        self.reset()
 
-    def setTransitionMatrix(self, transition_matrix):
-        """
-        The transition matrix here is intended as a matrix which has a line
-        for each action and the element of the row are the probabilities to
-        executes each action when a command is given. For example:
-        [[0.55, 0.25, 0.10, 0.10]
-         [0.25, 0.25, 0.25, 0.25]
-         [0.30, 0.20, 0.40, 0.10]
-         [0.10, 0.20, 0.10, 0.60]]
-        This matrix defines the transition rules for all the 4 possible actions.
-        The first row corresponds to the probabilities of executing each one of
-        the 4 actions when the policy orders to the robot to go UP. In this case
-        the transition model says that with a probability of 0.55 the robot will
-        go UP, with a probaiblity of 0.25 RIGHT, 0.10 DOWN and 0.10 LEFT.
-        """
-        if transition_matrix.shape != self.transition_matrix.shape:
-            raise ValueError('The shape of the two matrices must be the same.')
-        self.transition_matrix = transition_matrix
-
-    def setStateMatrix(self, state_matrix):
+    def setStateMatrix(self, state_matrix, set="all"):
         """Set the obstacles, player and goals in the world.
         The input to the function is a matrix with the
         same size of the world
-        -1 for states which are not walkable.
-        +1 for terminal states [+1, +2, +3, +4] - for 4 different goals
-         0 for all the walkable states (non-terminal)
-        The following matrix represents the 4x3 world
-        used in the series "dissecting reinforcement learning"
-        [[+3,  -1,   0,   +1]
-         [0,   -1,   0,   +4]
-         [0,    0,   0,   +2]]
         """
-        if state_matrix.shape != self.state_matrix.shape:
-            raise ValueError('The shape of the matrix does not match with the shape of the world.')
-        self.state_matrix = state_matrix
+        if set=="all":
+            if state_matrix.shape != self.state_matrix.shape:
+                raise ValueError('The shape of the matrix does not match with the shape of the world.')
+            self.state_matrix = state_matrix
+        elif set=="player":
+            if state_matrix.shape != self.state_matrix[self.PlayerMap].shape:
+                raise ValueError('The shape of the matrix does not match with the shape of the world.')
+            self.state_matrix[self.PlayerMap] = state_matrix
+        elif set == "walls":
+            if state_matrix.shape != self.state_matrix[self.WallMap].shape:
+                raise ValueError('The shape of the matrix does not match with the shape of the world.')
+            self.state_matrix[self.WallMap] = state_matrix
+        elif set=="goals":
+            if state_matrix.shape != self.state_matrix[self.GoalMap].shape:
+                raise ValueError('The shape of the matrix does not match with the shape of the world.')
+            self.state_matrix[self.GoalMap] = state_matrix
+        else:
+            raise ValueError('The \'set\' parameter is wrong. Try: all, walls, player, goals')
+
 
     def setPosition(self):
         """ Set the position of a player and 4 Goals randomly
             But only on a walkable cells.
-            ! Before using this method make sure you generated walls and put them
-              like game.setStateMatrix(state_matrix)
+            !!! Before using this method make sure you generated walls and put them
+                like game.setStateMatrix(state_matrix)
         """
 
+        # 1. Put player on the map
+        player_map = np.zeros((self.world_row, self.world_col), dtype=np.int16)
+        cnt_of_tries = 0
+        randomRow = 0
+        randomCol = 0
+
+        # Try random coordinates on the path, not walls
+        while True:
+            randomRow = np.random.randint(self.world_row)
+            randomCol = np.random.randint(self.world_col)
+            no_walls = self.state_matrix[self.WallMap, randomRow, randomCol] != self.MapSym[self.WallMap]["Wall"]
+            # no_goals = elf.state_matrix[self.GoalMap, randomRow, randomCol] == self.MapSym[self.GoalMap]["Other"] # if no_walls and no_goals
+            if no_walls:
+                break
+
+            # To prevent unsolvable maps (i.e. all walls)
+            if cnt_of_tries > 10:
+                self.reset()    # BUG: I should go out of loops, finish the function and then call reset(), as it will use setPosition automatically
+                cnt_of_tries = 0
+            else:
+                cnt_of_tries += 1
+
+        # Set the players position and record it on the map
+        self.position = [randomRow, randomCol]  # Redundant
+        player_map[randomRow, randomCol] = self.MapSym[self.PlayerMap]["Player"]
+        self.setStateMatrix(player_map, set="player")
+
+        # 2. Put Goals on the map
+        goal_map = np.zeros((self.world_row, self.world_col), dtype=np.int16)
+        Goals = self.MapSym[self.GoalMap].copy()
+        Goals.popitem() # Remove "Others", so only Goal A - D are in the dictionary
+
+        # EXAMPLE: key = "Goal A", value = 2
+        for key, value in Goals.items():
+            cnt_of_tries = 0
+            while True:
+                randomRow = np.random.randint(self.world_row)
+                randomCol = np.random.randint(self.world_col)
+                no_walls = self.state_matrix[self.WallMap, randomRow, randomCol] != self.MapSym[self.WallMap]["Wall"]
+                no_goals = goal_map[randomRow, randomCol] == self.MapSym[self.GoalMap]["Other"]
+                if no_walls and no_goals:
+                    break
+
+                # To prevent unsolvable maps (i.e. all walls)
+                if cnt_of_tries > 10:
+                    self.reset()    # BUG: I should go out of loops, finish the function and then call reset(), as it will use setPosition automatically
+                    cnt_of_tries = 0
+                else:
+                    cnt_of_tries += 1
+
+            goal_map[randomRow, randomCol] = self.MapSym[self.GoalMap][key]
+
+        print("Created Goal Map: ", goal_map)
+        self.setStateMatrix(goal_map, set="goals")
+
+        """
         # Next objects must be placed on the path: Player, Goal 1, Goal 2, Goal 3, Goal 4
         objectsToPlace = [self.ObjSym["Player"], self.ObjSym["Goal A"], self.ObjSym["Goal B"],
                           self.ObjSym["Goal C"], self.ObjSym["Goal D"]]
@@ -329,6 +406,8 @@ class GridWorld(Environment):
             # Save the player's position in the separate variable (could be reduced)
             if obj == self.ObjSym["Player"]:
                 self.position = [randomRow, randomCol]
+                
+        """
 
     def getWorldState(self):
         return self.state_matrix
@@ -343,6 +422,26 @@ class GridWorld(Environment):
         #           represents obstacles
         A, B, C, D  represent goals
         """
+        # FUTURE DEVELOPMENT: I can create graph in first two cycles!
+
+        # 1. Create 1xROWxCOL map from 3xROWxCOL
+        simple_map = np.ones((self.world_row, self.world_col), dtype=np.int16)  # 0-wall, 1-path. Start with all path, then add walls, then add goals
+
+        # Put walls
+        for row in range(self.world_row):
+            for col in range(self.world_col):
+                if self.state_matrix[self.WallMap, row, col] == self.MapSym[self.WallMap]["Wall"]: simple_map[row, col] = self.ObjSym["Wall"]
+
+        # Put goals
+        for row in range(self.world_row):
+            for col in range(self.world_col):
+                if   self.state_matrix[self.GoalMap, row, col] == self.MapSym[self.GoalMap]["Goal A"]: simple_map[row, col] = self.ObjSym["Goal A"]
+                elif self.state_matrix[self.GoalMap, row, col] == self.MapSym[self.GoalMap]["Goal B"]: simple_map[row, col] = self.ObjSym["Goal B"]
+                elif self.state_matrix[self.GoalMap, row, col] == self.MapSym[self.GoalMap]["Goal C"]: simple_map[row, col] = self.ObjSym["Goal C"]
+                elif self.state_matrix[self.GoalMap, row, col] == self.MapSym[self.GoalMap]["Goal D"]: simple_map[row, col] = self.ObjSym["Goal D"]
+
+
+        # 2. Draw a Map
         graph = ""
         for row in range(self.world_row):
             row_string = ""
@@ -353,12 +452,12 @@ class GridWorld(Environment):
 
                 # Draw walls, paths and goals
                 else:
-                    if   self.state_matrix[row, col] == self.ObjSym["Wall"]:   row_string += ' # '  # Wall
-                    elif self.state_matrix[row, col] == self.ObjSym["Path"]:   row_string += ' - '  # Path
-                    elif self.state_matrix[row, col] == self.ObjSym["Goal A"]: row_string += ' A '  # Goal 1
-                    elif self.state_matrix[row, col] == self.ObjSym["Goal B"]: row_string += ' B '  # Goal 2
-                    elif self.state_matrix[row, col] == self.ObjSym["Goal C"]: row_string += ' C '  # Goal 3
-                    elif self.state_matrix[row, col] == self.ObjSym["Goal D"]: row_string += ' D '  # Goal 4
+                    if   simple_map[row, col] == self.ObjSym["Wall"]:   row_string += ' # '  # Wall
+                    elif simple_map[row, col] == self.ObjSym["Path"]:   row_string += ' - '  # Path
+                    elif simple_map[row, col] == self.ObjSym["Goal A"]: row_string += ' A '  # Goal 1
+                    elif simple_map[row, col] == self.ObjSym["Goal B"]: row_string += ' B '  # Goal 2
+                    elif simple_map[row, col] == self.ObjSym["Goal C"]: row_string += ' C '  # Goal 3
+                    elif simple_map[row, col] == self.ObjSym["Goal D"]: row_string += ' D '  # Goal 4
                     else: print("ERROR: Incorrect map value! Position: " ,row, ", ", col)
 
             row_string += '\n'
