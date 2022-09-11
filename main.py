@@ -85,7 +85,7 @@ def main():
                             learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
                                                final_value=1e-5)),
              objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
+             reward_estimation=dict(horizon=10),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
              policy=dict(network='auto')),
 
@@ -99,7 +99,7 @@ def main():
                             learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
                                                final_value=1e-5)),
              objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
+             reward_estimation=dict(horizon=10),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
              policy=dict(network='auto')),
 
@@ -113,7 +113,7 @@ def main():
                             learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
                                                final_value=1e-5)),
              objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
+             reward_estimation=dict(horizon=10),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
              policy=dict(network='auto')),
 
@@ -127,7 +127,7 @@ def main():
                             learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
                                                final_value=1e-5)),
              objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
+             reward_estimation=dict(horizon=10),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
              policy=dict(network='auto')),
 
@@ -142,7 +142,7 @@ def main():
                             learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
                                                final_value=1e-5)),
              objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
+             reward_estimation=dict(horizon=10),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
              policy=[
                  [
@@ -186,7 +186,7 @@ def main():
                             learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
                                                final_value=1e-5)),
              objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
+             reward_estimation=dict(horizon=10),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
              policy=[
                  [
@@ -230,7 +230,7 @@ def main():
                             learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
                                                final_value=1e-5)),
              objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
+             reward_estimation=dict(horizon=10),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
              policy=[
                  [
@@ -274,7 +274,7 @@ def main():
                             learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
                                                final_value=1e-5)),
              objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
+             reward_estimation=dict(horizon=10),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
              policy=[
                  [
@@ -318,7 +318,7 @@ def main():
                             learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
                                                final_value=1e-5)),
              objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
+             reward_estimation=dict(horizon=10),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
              policy=[
                  [
@@ -362,7 +362,7 @@ def main():
                             learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
                                                final_value=1e-5)),
              objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
+             reward_estimation=dict(horizon=10),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
              policy=[
                  [
@@ -406,7 +406,7 @@ def main():
                             learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
                                                final_value=1e-5)),
              objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
+             reward_estimation=dict(horizon=10),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
              policy=[
                  [
@@ -450,7 +450,7 @@ def main():
                             learning_rate=dict(type='linear', unit='episodes', num_steps=10000, initial_value=1e-3,
                                                final_value=1e-5)),
              objective='policy_gradient',
-             reward_estimation=dict(horizon=1),
+             reward_estimation=dict(horizon=10),
              exploration=dict(type='linear', unit='episodes', num_steps=1000, initial_value=0.99, final_value=0.01),
              policy=[
                  [
